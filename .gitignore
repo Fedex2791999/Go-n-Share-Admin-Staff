@@ -5,6 +5,7 @@
 
 # cert folder
 /.cert
+/.cert-dev
 
 # testing
 /coverage
