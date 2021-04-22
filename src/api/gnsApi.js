@@ -2,12 +2,10 @@ import axios from 'axios';
 
 export const gnsAuthApi = axios.create({
   baseURL: 'https://www.gns.quangdvn.me/api/auth',
-  // baseURL: 'http://localhost:3000/',
 });
 
 export const gnsStaffApi = axios.create({
   baseURL: 'https://www.gns.quangdvn.me/api/staff',
-  // baseURL: 'http://localhost:3000/',
 });
 
 export const logIn = async (userInfo) => {
