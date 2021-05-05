@@ -18,33 +18,40 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import { DataGrid } from '@material-ui/data-grid';
-import {
-  getUserInfo,
-  getAllBooking,
-  getAllStaff,
-  getAllCoaches,
-  getAllDrivers,
-} from 'api/gnsApi';
-import { AppContext } from '../../store/store';
+import { AppContext } from 'store/store';
+import { MappingCityData } from '../Booking/Booking';
+import KeyboardBackspaceRoundedIcon from '@material-ui/icons/KeyboardBackspaceRounded';
+import { getUserInfo, getAllBooking, getAllRoutes } from 'api/gnsApi';
 
 const useStyles = makeStyles(styles);
 export default function Dashboard() {
-  const userToken = localStorage.getItem('token');
   const classes = useStyles();
+  const userToken = localStorage.getItem('token');
   const [showTable, setShowTable] = useState(false);
   const [selectionModel, setSelectionModel] = useState([]);
+  const [isVerify, setIsVerified] = useState([]);
+  const [notVerify, setNotVerified] = useState([]);
+  const [bookingMap, setBookingMap] = useState([]);
+  const { dispatch } = useContext(AppContext);
+  const { bookings } = useContext(AppContext).state;
   const data = {
     columns: [
-      { field: 'id', width: 50 },
+      { field: 'id', headerName: 'Mã ID', width: 100 },
       { field: 'bookingName', headerName: 'Họ và tên', width: 150 },
       { field: 'bookingMail', headerName: 'Email', width: 150 },
       { field: 'bookingPhone', headerName: 'Số điện thoại', width: 150 },
-      { field: 'totalPrice', headerName: 'Tổng giá', width: 50 },
+      { field: 'totalPrice', headerName: 'Tổng giá', width: 150 },
       {
         field: 'paymentMethod',
         headerName: 'Ghi chú',
         type: 'number',
-        width: 140,
+        width: 100,
+      },
+      {
+        field: 'fixedTrip',
+        headerName: '',
+        type: 'Tuyến đường',
+        width: 150,
       },
       {
         field: 'createdAt',
@@ -58,50 +65,21 @@ export default function Dashboard() {
         type: 'Ngày xuất phát',
         width: 200,
       },
-      {
-        field: 'fixedTrip',
-        headerName: '',
-        type: 'Tuyến đường',
-        width: 200,
-      },
     ],
-    rows: [
-      {
-        id: 1,
-        bookingName: 'Bùi Quang Huy',
-        bookingMail: 'codatduoc@gmail.com',
-        bookingPhone: '0973405092',
-        totalPrice: 100000,
-        isVerify: true,
-        isCancel: false,
-        hasTransit: true,
-        transitDetailId: 1,
-        notes: 'Thanh toán tiền mặt',
-        tripId: 1,
-        bookingStatus: 'success',
-        paymentMethod: 'online',
-        createdAt: '2021-04-24T17:53:46.949Z',
-        departureDate: '2021/05/25',
-        fixedTrip: 'Hà Nội -> Quảng Ninh',
-      },
-    ],
+    rows: bookingMap,
   };
-  const { dispatch } = useContext(AppContext);
 
   const formatNumber = (num) => {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
   };
+
   const getInitData = async () => {
     const bookings = await getAllBooking();
     const userInfo = await getUserInfo();
-    const staffList = await getAllStaff();
-    const coaches = await getAllCoaches();
-    const drivers = await getAllDrivers();
+    const routes = await getAllRoutes();
+    dispatch({ type: 'get-routes', payload: routes });
     dispatch({ type: 'get-booking', payload: bookings });
     dispatch({ type: 'get-profile', payload: userInfo });
-    dispatch({ type: 'get-staff', payload: staffList });
-    dispatch({ type: 'get-driver', payload: drivers });
-    dispatch({ type: 'get-coaches', payload: coaches });
   };
 
   useEffect(() => {
@@ -109,11 +87,35 @@ export default function Dashboard() {
       getInitData();
     }
   }, [userToken]);
+
+  useEffect(() => {
+    if (bookings.length > 0) {
+      const isVerify = bookings.filter((booking) => booking.isVerify === true);
+      const notVerify = bookings.filter(
+        (booking) => booking.isVerify === false,
+      );
+      const bookingMap = bookings.map((data) => {
+        return {
+          ...data,
+          totalPrice: `${formatNumber(data?.totalPrice)} VNĐ`,
+          departureDate: data?.tripDetail?.departureDate,
+          fixedTrip: `${
+            MappingCityData[data?.tripDetail?.departureLocation]
+          } -> ${MappingCityData[data?.tripDetail.arriveLocation]}`,
+        };
+      });
+      setIsVerified(isVerify);
+      setNotVerified(notVerify);
+      setBookingMap(bookingMap);
+    }
+  }, [bookings]);
+
   return showTable ? (
     <div style={{ height: 500, width: '100%' }}>
+      <KeyboardBackspaceRoundedIcon />
       <DataGrid
         pageSize={5}
-        // rowsPerPageOptions={[20, 20, 20]}
+        rowsPerPageOptions={[20, 20, 20]}
         onPageChange={(params) => {
           // setPage(params.page);
           console.log('params', params.page);
@@ -154,10 +156,8 @@ export default function Dashboard() {
               <CardIcon color="warning">
                 <Icon>content_copy</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Doanh Thu tháng 4</p>
-              <h3 className={classes.cardTitle}>
-                {formatNumber(43685000)} VNĐ
-              </h3>
+              <p className={classes.cardCategory}>Số chuyến đang thực hiện</p>
+              <h3 className={classes.cardTitle}>{15} chuyến</h3>
             </CardHeader>
             <CardFooter stats></CardFooter>
           </Card>
@@ -168,7 +168,7 @@ export default function Dashboard() {
               <CardIcon color="success">
                 <Store />
               </CardIcon>
-              <p className={classes.cardCategory}>Số chuyến thực hiện</p>
+              <p className={classes.cardCategory}>Số chuyến đã xác nhận</p>
               <div style={{ cursor: 'pointer' }}>
                 <h3
                   className={classes.cardTitle}
@@ -176,7 +176,7 @@ export default function Dashboard() {
                     setShowTable(true);
                   }}
                 >
-                  125 chuyến
+                  {isVerify.length} chuyến
                 </h3>
               </div>
             </CardHeader>
@@ -189,9 +189,11 @@ export default function Dashboard() {
               <CardIcon color="danger">
                 <Icon>info_outline</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Số chuyến huỷ</p>
+              <p className={classes.cardCategory}>Số chuyến chưa xác nhận</p>
               <div style={{ cursor: 'pointer' }}>
-                <h3 className={classes.cardTitle}>15 chuyến </h3>
+                <h3 className={classes.cardTitle}>
+                  {notVerify.length} chuyến{' '}
+                </h3>
               </div>
             </CardHeader>
             <CardFooter stats></CardFooter>
@@ -203,7 +205,7 @@ export default function Dashboard() {
               <CardIcon color="info">
                 <Accessibility />
               </CardIcon>
-              <p className={classes.cardCategory}>Số nhân viên hiện tại</p>
+              <p className={classes.cardCategory}>Số chuyến đã tạo</p>
               <Link to="/admin/staff/view">
                 <h3 className={classes.cardTitle}>15 người </h3>
               </Link>
@@ -212,7 +214,7 @@ export default function Dashboard() {
           </Card>
         </GridItem>
       </GridContainer>
-      <GridContainer>
+      {/* <GridContainer>
         <GridItem xs={12} sm={12} md={12}>
           <Card chart>
             <CardHeader color="warning">
@@ -230,6 +232,7 @@ export default function Dashboard() {
           </Card>
         </GridItem>
       </GridContainer>
+     */}
     </div>
   );
 }

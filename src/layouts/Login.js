@@ -5,17 +5,13 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { useHistory } from 'react-router';
-import { AUTH_URL } from '../api/environments-prod';
-import axios from 'axios';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { logIn } from 'api/gnsApi';
+import { logIn, getUserInfo } from 'api/gnsApi';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -44,25 +40,21 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
 
   const history = useHistory();
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const reqBody = { username, password };
-    setLoading(true);
-    // axios
-    //   .post(`${AUTH_URL}/staff/login`, reqBody)
-    //   .then(() => {
-    //     setLoading(false);
-    //     history.push('/admin/dashboard');
-    //   })
-    //   .catch((error) => {
-    //     setLoading(false);
-    //     console.log(error);
-    //   });
     try {
-      const { res } = await logIn(reqBody);
-      setLoading(false);
-      history.push('/admin/dashboard');
-      console.log(res);
+      const reqBody = { username, password };
+      setLoading(true);
+      const res = await logIn(reqBody);
+      if (res) {
+        const user = await getUserInfo();
+        setLoading(false);
+        if (user.role === 'scheduling') {
+          history.replace('/staff/dashboard');
+        } else if (user.role === 'supervising') {
+          history.replace('/admin/dashboard');
+        }
+      }
     } catch (err) {
       setLoading(false);
       console.log(err);
@@ -123,7 +115,7 @@ export default function SignIn() {
             variant="contained"
             color="primary"
             className={classes.submit}
-            onClick={handleSubmit}
+            onClick={handleLogin}
           >
             Đăng nhập
           </Button>

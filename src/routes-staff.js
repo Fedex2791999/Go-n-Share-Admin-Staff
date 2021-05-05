@@ -1,18 +1,18 @@
 import Person from '@material-ui/icons/Person';
 import UserProfile from 'views/UserProfile/UserProfile.js';
-import TableList from 'views/TableList/TableList.js';
-import Statistic from 'views/Statistic/Statistic.js';
+import Booking from 'views/Booking/Booking';
+import Trip from 'views/Trip/Trip';
 import Dashboard from '@material-ui/icons/Dashboard';
-import DashboardPage from 'views/Dashboard/Dashboard.js';
+import DashboardStaffPage from 'views/Dashboard/DashboardStaff';
 
-const dashboardRoutes = [
+const staffRoutes = [
   {
     path: '/dashboard',
-    name: 'Biểu đồ',
+    name: 'Thống kê',
     rtlName: 'لوحة القيادة',
     icon: Dashboard,
-    component: DashboardPage,
-    layout: '/admin',
+    component: DashboardStaffPage,
+    layout: '/staff',
   },
   {
     path: '/profile',
@@ -20,24 +20,24 @@ const dashboardRoutes = [
     rtlName: 'ملف تعريفي للمستخدم',
     icon: Person,
     component: UserProfile,
-    layout: '/admin',
+    layout: '/staff',
   },
   {
-    path: '/staff/view',
-    name: 'Danh sách Nhân Viên',
+    path: '/trip/create',
+    name: 'Tạo chuyến',
     rtlName: 'قائمة الجدول',
     icon: 'content_paste',
-    component: TableList,
-    layout: '/admin',
+    component: Trip,
+    layout: '/staff',
   },
   {
-    path: '/statistic',
-    name: 'Thống kê',
+    path: '/booking/unconfirm',
+    name: 'Vé chưa được xác nhận',
     rtlName: 'قائمة الجدول',
     icon: 'content_paste',
-    component: Statistic,
-    layout: '/admin',
+    component: Booking,
+    layout: '/staff',
   },
 ];
 
-export default dashboardRoutes;
+export default staffRoutes;

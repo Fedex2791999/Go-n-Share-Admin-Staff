@@ -7,7 +7,6 @@ import Card from 'components/Card/Card.js';
 import CardHeader from 'components/Card/CardHeader.js';
 import CardBody from 'components/Card/CardBody.js';
 import { AppContext } from '../../store/store';
-import { MappingRole, MappingWorkingStatus } from '../UserProfile/UserProfile';
 
 const styles = {
   cardCategoryWhite: {
@@ -41,20 +40,19 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-export default function TableList() {
+export default function CoachesList() {
   const classes = useStyles();
-  const { staffList } = useContext(AppContext).state;
-  const newlist = staffList
-    .filter((data) => data.role !== 'supervising')
-    .map((staff) => {
-      return [
-        `${staff.id}`,
-        `${staff.fullname}`,
-        `${staff.phone}`,
-        `${MappingRole[staff.role]}`,
-        `${MappingWorkingStatus[staff.workingStatus]}`,
-      ];
-    });
+  const { coaches } = useContext(AppContext).state;
+  const newlist = coaches.map((coach) => {
+    return [
+      `${coach.id}`,
+      `${coach.numberPlate}`,
+      `${coach.phone}`,
+      `${coach?.route?.departureId} -> ${coach?.route?.arriveId}`,
+      `${coach?.route?.basePrice}`,
+      `${coach?.route?.drivingDuration}`,
+    ];
+  });
   return (
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
@@ -65,7 +63,13 @@ export default function TableList() {
           <CardBody>
             <Table
               tableHeaderColor="primary"
-              tableHead={['Id', 'Họ tên', 'SĐT', 'Vai trò', 'Trạng thái']}
+              tableHead={[
+                'Id',
+                'Biển Số',
+                'Chăng cố định từ',
+                'Giá',
+                'Thời gian di chuyển',
+              ]}
               tableData={newlist}
             />
           </CardBody>
