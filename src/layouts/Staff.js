@@ -7,15 +7,16 @@ import Navbar from 'components/Navbars/Navbar.js';
 import Footer from 'components/Footer/Footer.js';
 import Sidebar from 'components/Sidebar/Sidebar.js';
 import FixedPlugin from 'components/FixedPlugin/FixedPlugin.js';
-import routesAdmin from 'routes-admin';
+import routesStaff from 'routes-staff';
 import styles from 'assets/jss/material-dashboard-react/layouts/adminStyle.js';
 import bgImage from 'assets/img/sidebar-2.jpg';
 import logo from 'assets/img/reactlogo.png';
 
 let ps;
-const switchRoutesAdmin = (
+
+const switchRoutesStaff = (
   <Switch>
-    {routesAdmin.map((prop, key) => (
+    {routesStaff.map((prop, key) => (
       <Route
         path={prop.layout + prop.path}
         component={prop.component}
@@ -27,13 +28,14 @@ const switchRoutesAdmin = (
 
 const useStyles = makeStyles(styles);
 
-export default function Admin({ ...rest }) {
+export default function Staff({ ...rest }) {
   const classes = useStyles();
   const mainPanel = React.createRef();
   const [image, setImage] = useState(bgImage);
   const [color, setColor] = useState('blue');
   const [fixedClasses, setFixedClasses] = useState('dropdown');
   const [mobileOpen, setMobileOpen] = useState(false);
+
   useEffect(() => {
     if (navigator.platform.indexOf('Win') > -1) {
       ps = new PerfectScrollbar(mainPanel.current, {
@@ -72,11 +74,12 @@ export default function Admin({ ...rest }) {
       setMobileOpen(false);
     }
   };
+
   return (
     <div className={classes.wrapper}>
       <Sidebar
-        routes={routesAdmin}
-        logoText="Chủ hợp tác xã"
+        routes={routesStaff}
+        logoText="Nhân viên quản lý"
         logo={logo}
         image={image}
         handleDrawerToggle={handleDrawerToggle}
@@ -86,13 +89,14 @@ export default function Admin({ ...rest }) {
       />
       <div className={classes.mainPanel} ref={mainPanel}>
         <Navbar
-          routes={routesAdmin}
+          routes={routesStaff}
           handleDrawerToggle={handleDrawerToggle}
           {...rest}
         />
 
         <div className={classes.content}>
-          <div className={classes.container}>{switchRoutesAdmin}</div>
+          {/* render component */}
+          <div className={classes.container}>{switchRoutesStaff}</div>
         </div>
 
         <Footer />

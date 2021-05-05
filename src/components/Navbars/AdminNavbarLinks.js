@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import classNames from 'classnames';
 import { useHistory } from 'react-router-dom';
 // @material-ui/core components
@@ -14,22 +14,20 @@ import Divider from '@material-ui/core/Divider';
 // @material-ui/icons
 import Person from '@material-ui/icons/Person';
 import Notifications from '@material-ui/icons/Notifications';
-import Dashboard from '@material-ui/icons/Dashboard';
-import Search from '@material-ui/icons/Search';
 // core components
-import CustomInput from 'components/CustomInput/CustomInput.js';
 import Button from 'components/CustomButtons/Button.js';
-import axios from 'axios';
 import styles from 'assets/jss/material-dashboard-react/components/headerLinksStyle.js';
-import { AUTH_URL } from 'api/environments-prod';
+import { logOut } from 'api/gnsApi';
+import { AppContext } from 'store/store';
 
 const useStyles = makeStyles(styles);
-
 export default function AdminNavbarLinks() {
   const classes = useStyles();
   const [openNotification, setOpenNotification] = React.useState(null);
   const [openProfile, setOpenProfile] = React.useState(null);
   const history = useHistory();
+  const { role } = useContext(AppContext).state?.userInfo;
+  const { dispatch } = useContext(AppContext);
   const handleClickNotification = (event) => {
     if (openNotification && openNotification.contains(event.target)) {
       setOpenNotification(null);
@@ -49,6 +47,14 @@ export default function AdminNavbarLinks() {
   };
   const handleCloseProfile = () => {
     setOpenProfile(null);
+  };
+  const handleLogout = async () => {
+    const res = await logOut();
+    if (res) {
+      history.push('/login');
+      handleCloseProfile();
+      dispatch({ type: 'reset-state' });
+    }
   };
   return (
     <div>
@@ -170,7 +176,12 @@ export default function AdminNavbarLinks() {
                   <MenuList role="menu">
                     <MenuItem
                       onClick={() => {
-                        history.push('/admin/profile');
+                        if (role === 'supervising') {
+                          history.push('/admin/profile');
+                        } else if (role === 'scheduling') {
+                          history.push('/staff/profile');
+                        }
+                        handleCloseProfile();
                       }}
                       className={classes.dropdownItem}
                     >
@@ -178,19 +189,7 @@ export default function AdminNavbarLinks() {
                     </MenuItem>
                     <Divider light />
                     <MenuItem
-                      onClick={() => {
-                        axios
-                          .delete(`${AUTH_URL}/staff/logout`, {
-                            withCredentials: true,
-                          })
-                          .then(() => {
-                            history.push('/login');
-                            handleCloseProfile();
-                          })
-                          .catch((error) => {
-                            console.log(error);
-                          });
-                      }}
+                      onClick={handleLogout}
                       className={classes.dropdownItem}
                     >
                       Đăng xuất

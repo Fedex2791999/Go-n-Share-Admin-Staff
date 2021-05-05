@@ -1,20 +1,21 @@
-import React from "react";
-import { withStyles } from "@material-ui/core/styles";
-import { makeStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import MuiDialogTitle from "@material-ui/core/DialogTitle";
-import MuiDialogContent from "@material-ui/core/DialogContent";
-import MuiDialogActions from "@material-ui/core/DialogActions";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
-import Typography from "@material-ui/core/Typography";
-import Container from "@material-ui/core/Container";
-import { TextField, Select } from "formik-material-ui";
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import Input from "@material-ui/core/Input";
-import { Formik, Form, Field } from "formik";
+import React, {useContext} from 'react';
+import { withStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import MuiDialogTitle from '@material-ui/core/DialogTitle';
+import MuiDialogContent from '@material-ui/core/DialogContent';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
+import Typography from '@material-ui/core/Typography';
+import Container from '@material-ui/core/Container';
+import { TextField, Select } from 'formik-material-ui';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import Input from '@material-ui/core/Input';
+import { Formik, Form, Field } from 'formik';
+import { createStaff,getAllStaff } from 'api/gnsApi';
+import { AppContext } from '../../store/store';
 
 const styles = (theme) => ({
   root: {
@@ -22,7 +23,7 @@ const styles = (theme) => ({
     padding: theme.spacing(2),
   },
   closeButton: {
-    position: "absolute",
+    position: 'absolute',
     right: theme.spacing(1),
     top: theme.spacing(1),
     color: theme.palette.grey[500],
@@ -32,16 +33,16 @@ const styles = (theme) => ({
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   avatar: {
     margin: theme.spacing(1),
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: "100%", // Fix IE 11 issue.
+    width: '100%', // Fix IE 11 issue.
     marginTop: theme.spacing(1),
   },
   submit: {
@@ -78,16 +79,10 @@ const DialogContent = withStyles((theme) => ({
   },
 }))(MuiDialogContent);
 
-const DialogActions = withStyles((theme) => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(1),
-  },
-}))(MuiDialogActions);
-
 export default function CustomizedDialogs() {
   const [open, setOpen] = React.useState(false);
   const classes = useStyles();
+  const { dispatch } = useContext(AppContext);
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -95,8 +90,17 @@ export default function CustomizedDialogs() {
     setOpen(false);
   };
 
+  const handleSubmit = async (values) => {
+    const res = await createStaff(values);
+    if(res) {
+      const staffList = await getAllStaff();
+      dispatch({ type: 'get-staff', payload: staffList });
+    }
+    handleClose();
+  };
+
   return (
-    <div style={{ display: "flex", justifyContent: "flex-end", width: "88%" }}>
+    <div style={{ display: 'flex', justifyContent: 'flex-end', width: '88%' }}>
       <Button variant="outlined" color="primary" onClick={handleClickOpen}>
         Thêm nhân viên
       </Button>
@@ -111,14 +115,14 @@ export default function CustomizedDialogs() {
         <DialogContent dividers>
           <Formik
             initialValues={{
-              fullname: "",
-              username: "",
-              password: "",
-              phone: "",
-              role: "",
+              fullname: '',
+              username: '',
+              password: '',
+              phone: '',
+              role: '',
             }}
             onSubmit={(values) => {
-              console.log("values", values);
+              handleSubmit(values);
             }}
           >
             <Form>
@@ -134,8 +138,10 @@ export default function CustomizedDialogs() {
                     name="fullname"
                     autoComplete="fullname"
                     autoFocus
+                    minLength={10}
+                    maxLength={50}
                   />
-                  <div style={{ display: "flex" }}>
+                  <div style={{ display: 'flex' }}>
                     <Field
                       component={TextField}
                       margin="normal"
@@ -143,7 +149,6 @@ export default function CustomizedDialogs() {
                       fullWidth
                       name="phone"
                       label="Số điện thoại"
-                      type="phone"
                       id="phone"
                       autoComplete="phone"
                     />
@@ -162,7 +167,7 @@ export default function CustomizedDialogs() {
                         <option
                           aria-label="None"
                           value=""
-                          style={{ display: "none" }}
+                          style={{ display: 'none' }}
                         />
                         <option value="tracking">Theo dõi</option>
                         <option value="scheduling">Lập lịch</option>
@@ -191,9 +196,10 @@ export default function CustomizedDialogs() {
                     type="password"
                     id="password"
                     autoComplete="current-password"
+                    minLength={6}
                   />
                 </div>
-                <div style={{ float: "right" }}>
+                <div style={{ float: 'right' }}>
                   <Button
                     type="submit"
                     fullWidt

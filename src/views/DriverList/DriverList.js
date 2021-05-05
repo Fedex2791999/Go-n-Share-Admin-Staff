@@ -41,33 +41,38 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-export default function TableList() {
+export default function DriverList() {
   const classes = useStyles();
-  const { staffList } = useContext(AppContext).state;
-  const newlist = staffList
-    .filter((data) => data.role !== 'supervising')
-    .map((staff) => {
-      return [
-        `${staff.id}`,
-        `${staff.fullname}`,
-        `${staff.phone}`,
-        `${MappingRole[staff.role]}`,
-        `${MappingWorkingStatus[staff.workingStatus]}`,
-      ];
-    });
+  const { drivers } = useContext(AppContext).state;
+  const newlist = drivers.map((driver) => {
+    return [
+      `${driver.id}`,
+      `${driver.fullname}`,
+      `${driver?.location?.name}`,
+      `${MappingRole[driver.role]}`,
+      `${driver?.phone}`,
+      `${MappingWorkingStatus[driver.workingStatus]}`,
+    ];
+  });
   return (
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
           <CardHeader color="primary">
-            <h4 className={classes.cardTitleWhite}>Thông tin Nhân Viên</h4>
+            <h4 className={classes.cardTitleWhite}>Thông tin Tài Xế</h4>
           </CardHeader>
           <CardBody>
             <Table
               tableHeaderColor="primary"
-              tableHead={['Id', 'Họ tên', 'SĐT', 'Vai trò', 'Trạng thái']}
+              tableHead={[
+                'Id',
+                'Họ tên',
+                'Nơi đăng ký làm việc',
+                'Vai trò',
+                'Số điện thoại',
+                'Trang thái làm việc',
+              ]}
               tableData={newlist}
-              addStaff
             />
           </CardBody>
         </Card>
