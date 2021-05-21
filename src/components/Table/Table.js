@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 // @material-ui/core components
@@ -22,7 +23,7 @@ export default function CustomTable(props) {
   const { tableHead, tableData, tableHeaderColor } = props;
   return (
     <div className={classes.tableResponsive}>
-      <Dialog />
+      {props.addStaff && <Dialog />}
       <Table className={classes.table}>
         {tableHead !== undefined ? (
           <TableHead className={classes[tableHeaderColor + 'TableHeader']}>
@@ -42,18 +43,22 @@ export default function CustomTable(props) {
         ) : null}
         <TableBody>
           {tableData.map((prop, key) => {
-            console.log('props', prop);
             return (
               <TableRow key={key} className={classes.tableBodyRow} hover>
-                {prop.map((prop, key) => {
-                  return (
-                    <TableCell className={classes.tableCell} key={key}>
-                      {prop}
-                    </TableCell>
-                  );
-                })}
-                <div style={{ marginTop: 7 }}>
-                  {props[4] !== 'Đã nghỉ hưu' && (
+                {prop.map((prop, key) => (
+                  <TableCell className={classes.tableCell} key={key}>
+                    {prop}
+                  </TableCell>
+                ))}
+
+                {prop[4] === 'Đang làm việc' && (
+                  <div
+                    style={{
+                      position: 'relative',
+                      right: 118,
+                      top: 6,
+                    }}
+                  >
                     <Button
                       variant="contained"
                       color="secondary"
@@ -65,8 +70,8 @@ export default function CustomTable(props) {
                     >
                       Sa thải
                     </Button>
-                  )}
-                </div>
+                  </div>
+                )}
               </TableRow>
             );
           })}

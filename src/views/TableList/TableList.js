@@ -67,6 +67,7 @@ export default function TableList() {
               tableHeaderColor="primary"
               tableHead={['Id', 'Họ tên', 'SĐT', 'Vai trò', 'Trạng thái']}
               tableData={newlist}
+              addStaff
             />
           </CardBody>
         </Card>

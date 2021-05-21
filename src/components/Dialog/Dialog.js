@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
@@ -14,7 +14,8 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Input from '@material-ui/core/Input';
 import { Formik, Form, Field } from 'formik';
-import { createStaff } from 'api/gnsApi';
+import { createStaff, getAllStaff } from 'api/gnsApi';
+import { AppContext } from '../../store/store';
 
 const styles = (theme) => ({
   root: {
@@ -81,6 +82,7 @@ const DialogContent = withStyles((theme) => ({
 export default function CustomizedDialogs() {
   const [open, setOpen] = React.useState(false);
   const classes = useStyles();
+  const { dispatch } = useContext(AppContext);
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -89,7 +91,12 @@ export default function CustomizedDialogs() {
   };
 
   const handleSubmit = async (values) => {
-    await createStaff(values);
+    const res = await createStaff(values);
+    if (res) {
+      const staffList = await getAllStaff();
+      dispatch({ type: 'get-staff', payload: staffList });
+    }
+    handleClose();
   };
 
   return (
@@ -142,7 +149,6 @@ export default function CustomizedDialogs() {
                       fullWidth
                       name="phone"
                       label="Số điện thoại"
-                      type="number"
                       id="phone"
                       autoComplete="phone"
                     />

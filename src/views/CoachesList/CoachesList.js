@@ -7,6 +7,7 @@ import Card from 'components/Card/Card.js';
 import CardHeader from 'components/Card/CardHeader.js';
 import CardBody from 'components/Card/CardBody.js';
 import { AppContext } from '../../store/store';
+import { formatNumber } from '../Dashboard/Dashboard';
 
 const styles = {
   cardCategoryWhite: {
@@ -47,10 +48,9 @@ export default function CoachesList() {
     return [
       `${coach.id}`,
       `${coach.numberPlate}`,
-      `${coach.phone}`,
       `${coach?.route?.departureId} -> ${coach?.route?.arriveId}`,
-      `${coach?.route?.basePrice}`,
-      `${coach?.route?.drivingDuration}`,
+      `${formatNumber(coach?.route?.basePrice)} vnd`,
+      `${coach?.route?.drivingDuration} tiếng`,
     ];
   });
   return (
@@ -58,7 +58,7 @@ export default function CoachesList() {
       <GridItem xs={12} sm={12} md={12}>
         <Card>
           <CardHeader color="primary">
-            <h4 className={classes.cardTitleWhite}>Thông tin Nhân Viên</h4>
+            <h4 className={classes.cardTitleWhite}>Thông tin Xe Khách</h4>
           </CardHeader>
           <CardBody>
             <Table

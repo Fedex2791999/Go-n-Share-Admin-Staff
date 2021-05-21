@@ -34,7 +34,16 @@ export const getUserInfo = async () => {
     const res = await gnsStaffApi.get('staff/me', reqConfig);
     return res.data.data;
   } catch (err) {
-    console.log(err.message);
+    alert(err.response.data.message);
+  }
+};
+
+export const refusedBooking = async (reqBody) => {
+  try {
+    await gnsBookingApi.post('/booking/verify/', reqBody, reqConfig);
+    alert('Từ chối chuyến đi thành công!');
+  } catch (err) {
+    alert(err.response.data.message);
   }
 };
 
@@ -141,15 +150,6 @@ export const sackStaff = async (staffId) => {
   try {
     await gnsStaffApi.post(`/staff/sacking/${staffId}`);
     alert('Sa thải nhân viên thành công!');
-  } catch (err) {
-    alert(err.response.data.message);
-  }
-};
-
-export const refusedBooking = async (reqBody) => {
-  try {
-    await gnsBookingApi.post('/booking/verify/', reqBody, reqConfig);
-    alert('Từ chối chuyến đi thành công!');
   } catch (err) {
     alert(err.response.data.message);
   }

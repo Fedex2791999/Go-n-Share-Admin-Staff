@@ -28,6 +28,11 @@ import {
 import { AppContext } from '../../store/store';
 
 const useStyles = makeStyles(styles);
+
+export const formatNumber = (num) => {
+  return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+};
+
 export default function Dashboard() {
   const userToken = localStorage.getItem('token');
   const classes = useStyles();
@@ -88,9 +93,6 @@ export default function Dashboard() {
   };
   const { dispatch } = useContext(AppContext);
 
-  const formatNumber = (num) => {
-    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-  };
   const getInitData = async () => {
     const bookings = await getAllBooking();
     const userInfo = await getUserInfo();

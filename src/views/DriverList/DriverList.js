@@ -50,6 +50,7 @@ export default function DriverList() {
       `${driver.fullname}`,
       `${driver?.location?.name}`,
       `${MappingRole[driver.role]}`,
+      `${driver?.phone}`,
       `${MappingWorkingStatus[driver.workingStatus]}`,
     ];
   });
@@ -58,7 +59,7 @@ export default function DriverList() {
       <GridItem xs={12} sm={12} md={12}>
         <Card>
           <CardHeader color="primary">
-            <h4 className={classes.cardTitleWhite}>Thông tin Nhân Viên</h4>
+            <h4 className={classes.cardTitleWhite}>Thông tin Tài Xế</h4>
           </CardHeader>
           <CardBody>
             <Table

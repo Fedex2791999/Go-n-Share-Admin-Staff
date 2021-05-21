@@ -1,24 +1,30 @@
 /* eslint-disable react/prop-types */
-import React from 'react';
+import React, { useContext } from 'react';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { sackStaff } from 'api/gnsApi';
+import { sackStaff, getAllStaff } from 'api/gnsApi';
+import { AppContext } from '../../store/store';
 
 export default function ConFirmModal({
   staffId,
   openConFirmModal,
   setOpenConfirmModal,
 }) {
+  const { dispatch } = useContext(AppContext);
   const handleClose = () => {
     setOpenConfirmModal(false);
   };
 
   const handleSackStaff = async () => {
-    await sackStaff(staffId);
+    const res = await sackStaff(staffId);
+    if (res) {
+      const staffList = await getAllStaff();
+      dispatch({ type: 'get-staff', payload: staffList });
+    }
     handleClose();
   };
   return (
