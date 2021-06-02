@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import ChartistGraph from 'react-chartist';
 import { makeStyles } from '@material-ui/core/styles';
 import Icon from '@material-ui/core/Icon';
@@ -93,7 +93,7 @@ export default function Dashboard() {
   };
   const { dispatch } = useContext(AppContext);
 
-  const getInitData = async () => {
+  const getInitData = useCallback(async () => {
     const bookings = await getAllBooking();
     const userInfo = await getUserInfo();
     const staffList = await getAllStaff();
@@ -104,13 +104,13 @@ export default function Dashboard() {
     dispatch({ type: 'get-staff', payload: staffList });
     dispatch({ type: 'get-driver', payload: drivers });
     dispatch({ type: 'get-coaches', payload: coaches });
-  };
+  }, [dispatch]);
 
   useEffect(() => {
     if (userToken) {
       getInitData();
     }
-  }, [userToken]);
+  }, [userToken, getInitData]);
   return showTable ? (
     <div style={{ height: 500, width: '100%' }}>
       <DataGrid

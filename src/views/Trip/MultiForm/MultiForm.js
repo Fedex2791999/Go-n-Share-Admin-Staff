@@ -12,7 +12,7 @@ import { getAvailabelCoach, getAvailabelDrivers, createTrip } from 'api/gnsApi';
 import GetStep from './GetStep/GetStep';
 import { MutiFormProvider } from './store/store';
 import { AppContext } from 'store/store';
-
+import { driverList } from 'constraint/driver.const';
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '50%',
@@ -28,6 +28,7 @@ const useStyles = makeStyles((theme) => ({
     borderTop: '2px solid #eeeeee',
     borderBottom: '2px solid #eeeeee',
     paddingBottom: 20,
+    height: 420,
   },
   formControl: {
     margin: theme.spacing(1),
@@ -90,7 +91,11 @@ export default function MultiForm() {
       shift: parseInt(selectedShift),
       drivingDuration: routeObject.drivingDuration,
     };
-    const drivers = await getAvailabelDrivers(reqBody);
+    const driversId = await getAvailabelDrivers(reqBody);
+    const drivers = driversId.map((driverId) => {
+      const res = driverList.find((driver) => driver.id === driverId);
+      return res;
+    });
     setDrivers(drivers);
   };
 

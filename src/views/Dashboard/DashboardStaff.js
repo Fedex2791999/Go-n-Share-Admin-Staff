@@ -1,5 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
-import ChartistGraph from 'react-chartist';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Icon from '@material-ui/core/Icon';
 import Store from '@material-ui/icons/Store';
@@ -9,14 +8,8 @@ import GridContainer from 'components/Grid/GridContainer.js';
 import Card from 'components/Card/Card.js';
 import CardHeader from 'components/Card/CardHeader.js';
 import CardIcon from 'components/Card/CardIcon.js';
-import CardBody from 'components/Card/CardBody.js';
 import CardFooter from 'components/Card/CardFooter.js';
-import { completedTasksChart } from 'variables/charts.js';
 import styles from 'assets/jss/material-dashboard-react/views/dashboardStyle.js';
-import { Link } from 'react-router-dom';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import InputLabel from '@material-ui/core/InputLabel';
 import { DataGrid } from '@material-ui/data-grid';
 import { AppContext } from 'store/store';
 import { MappingCityData } from '../Booking/Booking';
@@ -27,9 +20,10 @@ const useStyles = makeStyles(styles);
 export default function Dashboard() {
   const classes = useStyles();
   const userToken = localStorage.getItem('token');
-  const [showTable, setShowTable] = useState(false);
+  const [showTable] = useState(false);
   const [selectionModel, setSelectionModel] = useState([]);
   const [isVerify, setIsVerified] = useState([]);
+  const [isCancel, setIsCancel] = useState([]);
   const [notVerify, setNotVerified] = useState([]);
   const [bookingMap, setBookingMap] = useState([]);
   const { dispatch } = useContext(AppContext);
@@ -73,24 +67,25 @@ export default function Dashboard() {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
   };
 
-  const getInitData = async () => {
+  const getInitData = useCallback(async () => {
     const bookings = await getAllBooking();
     const userInfo = await getUserInfo();
     const routes = await getAllRoutes();
     dispatch({ type: 'get-routes', payload: routes });
     dispatch({ type: 'get-booking', payload: bookings });
     dispatch({ type: 'get-profile', payload: userInfo });
-  };
+  }, [dispatch]);
 
   useEffect(() => {
     if (userToken) {
       getInitData();
     }
-  }, [userToken]);
+  }, [userToken, getInitData]);
 
   useEffect(() => {
     if (bookings.length > 0) {
-      const isVerify = bookings.filter((booking) => booking.isVerify === true);
+      const isVerify = bookings.filter((booking) => booking.isVerify);
+      const isCancel = bookings.filter((booking) => booking.isCancel);
       const notVerify = bookings.filter(
         (booking) => booking.isVerify === false,
       );
@@ -105,6 +100,7 @@ export default function Dashboard() {
         };
       });
       setIsVerified(isVerify);
+      setIsCancel(isCancel);
       setNotVerified(notVerify);
       setBookingMap(bookingMap);
     }
@@ -131,24 +127,6 @@ export default function Dashboard() {
     </div>
   ) : (
     <div>
-      <GridContainer justify="flex-end">
-        <FormControl className={classes.formControl}>
-          <InputLabel htmlFor="grouped-native-select">Lựa chọn</InputLabel>
-          <Select
-            native
-            id="grouped-native-select"
-            onChange={(e) => {
-              console.log('values', e.target.value);
-            }}
-          >
-            <option value={4}>Tháng 4</option>
-            <option value={3}>Tháng 3</option>
-            <option value={2}>Tháng 2</option>
-            <option value={1}>Tháng 1</option>
-            {/* </optgroup> */}
-          </Select>
-        </FormControl>
-      </GridContainer>
       <GridContainer>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
@@ -156,8 +134,8 @@ export default function Dashboard() {
               <CardIcon color="warning">
                 <Icon>content_copy</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Số chuyến đang thực hiện</p>
-              <h3 className={classes.cardTitle}>{15} chuyến</h3>
+              <p className={classes.cardCategory}>Tổng số vé đã huỷ</p>
+              <h3 className={classes.cardTitle}>{isCancel.length} vé</h3>
             </CardHeader>
             <CardFooter stats></CardFooter>
           </Card>
@@ -168,15 +146,15 @@ export default function Dashboard() {
               <CardIcon color="success">
                 <Store />
               </CardIcon>
-              <p className={classes.cardCategory}>Số chuyến đã xác nhận</p>
+              <p className={classes.cardCategory}>Tổng số vé đã xác nhận</p>
               <div style={{ cursor: 'pointer' }}>
                 <h3
                   className={classes.cardTitle}
-                  onClick={() => {
-                    setShowTable(true);
-                  }}
+                  // onClick={() => {
+                  //   setShowTable(true);
+                  // }}
                 >
-                  {isVerify.length} chuyến
+                  {isVerify.length} vé
                 </h3>
               </div>
             </CardHeader>
@@ -189,11 +167,9 @@ export default function Dashboard() {
               <CardIcon color="danger">
                 <Icon>info_outline</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Số chuyến chưa xác nhận</p>
+              <p className={classes.cardCategory}>Tổng số vé chưa xác nhận</p>
               <div style={{ cursor: 'pointer' }}>
-                <h3 className={classes.cardTitle}>
-                  {notVerify.length} chuyến{' '}
-                </h3>
+                <h3 className={classes.cardTitle}>{notVerify.length} vé </h3>
               </div>
             </CardHeader>
             <CardFooter stats></CardFooter>
@@ -206,33 +182,14 @@ export default function Dashboard() {
                 <Accessibility />
               </CardIcon>
               <p className={classes.cardCategory}>Số chuyến đã tạo</p>
-              <Link to="/admin/staff/view">
-                <h3 className={classes.cardTitle}>15 người </h3>
-              </Link>
+              <div style={{ cursor: 'pointer' }}>
+                <h3 className={classes.cardTitle}>15 chuyến </h3>
+              </div>
             </CardHeader>
             <CardFooter stats></CardFooter>
           </Card>
         </GridItem>
       </GridContainer>
-      {/* <GridContainer>
-        <GridItem xs={12} sm={12} md={12}>
-          <Card chart>
-            <CardHeader color="warning">
-              <ChartistGraph
-                className="ct-chart"
-                data={completedTasksChart.data}
-                type="Line"
-                options={completedTasksChart.options}
-                listener={completedTasksChart.animation}
-              />
-            </CardHeader>
-            <CardBody>
-              <h4 className={classes.cardTitle}>Biểu đồ Doanh thu</h4>
-            </CardBody>
-          </Card>
-        </GridItem>
-      </GridContainer>
-     */}
     </div>
   );
 }

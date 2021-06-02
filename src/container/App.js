@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useCallback } from 'react';
 import { createBrowserHistory } from 'history';
 import {
   BrowserRouter as Router,
@@ -29,7 +29,7 @@ export default function App() {
   const userToken = localStorage.getItem('token');
   // const [role, setRole] = useState(null);
   const { dispatch } = useContext(AppContext);
-  const getInitData = async () => {
+  const getInitData = useCallback(async () => {
     const bookings = await getAllBooking();
     const userInfo = await getUserInfo();
     if (userInfo?.role === 'scheduling') {
@@ -49,12 +49,12 @@ export default function App() {
     dispatch({ type: 'get-profile', payload: userInfo });
 
     // setRole(userInfo.role);
-  };
+  }, [dispatch]);
   useEffect(() => {
     if (userToken) {
       getInitData();
     }
-  }, [userToken]);
+  }, [userToken, getInitData]);
   return (
     <Router history={hist}>
       <Switch>

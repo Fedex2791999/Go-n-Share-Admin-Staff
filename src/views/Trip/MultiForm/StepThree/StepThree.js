@@ -1,11 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
-import {
-  FormControl,
-  Select,
-  Button,
-  CircularProgress,
-} from '@material-ui/core';
+import { FormControl, Select } from '@material-ui/core';
 
 const StepThree = (props) => {
   return (
@@ -28,9 +23,9 @@ const StepThree = (props) => {
             >
               Lựa chọn tài xế
             </option>
-            {props.drivers.map((driverId, index) => (
-              <option value={driverId} key={index}>
-                Tài xế số: {driverId}
+            {props.drivers.map((driver, index) => (
+              <option value={driver.id} key={index}>
+                {`Tài xế: ${driver.fullname} ~ SĐT: ${driver.phone}`}
               </option>
             ))}
           </Select>
