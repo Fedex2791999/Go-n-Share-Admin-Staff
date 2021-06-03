@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-// @material-ui/core components
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
@@ -11,12 +10,12 @@ import TableCell from '@material-ui/core/TableCell';
 import Button from '@material-ui/core/Button';
 import Dialog from '../Dialog/Dialog';
 import ConFirmModal from '../ConfirmModal/ConfirmModal';
-// core components
 import styles from 'assets/jss/material-dashboard-react/components/tableStyle.js';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(styles);
 
-export default function CustomTable(props) {
+export default function TableDriver(props) {
   const classes = useStyles();
   const [openConFirmModal, setOpenConfirmModal] = useState(false);
   const [staffId, setStaffId] = useState('');
@@ -47,7 +46,7 @@ export default function CustomTable(props) {
               <TableRow key={key} className={classes.tableBodyRow} hover>
                 {prop.map((data, key) => (
                   <TableCell className={classes.tableCell} key={key}>
-                    {data}
+                    <Link to={`/admin/driver/view/${prop[0]}`}>{data}</Link>
                   </TableCell>
                 ))}
 
@@ -88,11 +87,11 @@ export default function CustomTable(props) {
   );
 }
 
-CustomTable.defaultProps = {
+TableDriver.defaultProps = {
   tableHeaderColor: 'gray',
 };
 
-CustomTable.propTypes = {
+TableDriver.propTypes = {
   tableHeaderColor: PropTypes.oneOf([
     'warning',
     'primary',

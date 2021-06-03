@@ -11,6 +11,7 @@ import 'react-dates/lib/css/_datepicker.css';
 import Admin from 'layouts/Admin.js';
 import Staff from 'layouts/Staff';
 import Login from 'layouts/Login.js';
+import DriverDetail from '../views/DriverDetail/DriverDetail';
 import 'assets/css/material-dashboard-react.css?v=1.9.0';
 import 'react-toastify/dist/ReactToastify.css';
 import { AppContext } from '../store/store';
@@ -61,7 +62,7 @@ export default function App() {
         <Route path="/admin" component={Admin} />
         <Route path="/staff" component={Staff} />
         <Route path="/login" component={Login} />
-
+        <Route path="/admin/driver/view/:id" component={DriverDetail} />
         <Redirect from="/" to="/login" />
         {/* {role === 'supervising' && <Route path="/admin" component={Admin} />}
         <Route path="/login" component={Login} />

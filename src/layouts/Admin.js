@@ -11,10 +11,11 @@ import routesAdmin from 'routes-admin';
 import styles from 'assets/jss/material-dashboard-react/layouts/adminStyle.js';
 import bgImage from 'assets/img/sidebar-2.jpg';
 import logo from 'assets/img/reactlogo.png';
-
+import DriverDetail from '../views/DriverDetail/DriverDetail';
 let ps;
 const switchRoutesAdmin = (
   <Switch>
+    <Route path="/admin/driver/view/:id" component={DriverDetail} />
     {routesAdmin.map((prop, key) => (
       <Route
         path={prop.layout + prop.path}
@@ -93,6 +94,7 @@ export default function Admin({ ...rest }) {
 
         <div className={classes.content}>
           <div className={classes.container}>{switchRoutesAdmin}</div>
+          {/* <div>{test}</div> */}
         </div>
 
         <Footer />

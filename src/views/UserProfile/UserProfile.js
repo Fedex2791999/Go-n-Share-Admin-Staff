@@ -39,6 +39,13 @@ export const MappingRole = {
   transitTrip: 'Tài xế yêu cầu',
   fixedTrip: 'Tài xế cố định',
 };
+
+export const MappingShift = {
+  7: 'Ca sáng',
+  14: 'Ca chiều',
+  20: 'Ca tối',
+};
+
 export const MappingWorkingStatus = {
   working: 'Đang làm việc',
   resign: 'Đã nghỉ hưu',

@@ -14,9 +14,6 @@ import CardFooter from 'components/Card/CardFooter.js';
 import { completedTasksChart } from 'variables/charts.js';
 import styles from 'assets/jss/material-dashboard-react/views/dashboardStyle.js';
 import { Link } from 'react-router-dom';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import InputLabel from '@material-ui/core/InputLabel';
 import { DataGrid } from '@material-ui/data-grid';
 import {
   getUserInfo,
@@ -37,6 +34,10 @@ export default function Dashboard() {
   const userToken = localStorage.getItem('token');
   const classes = useStyles();
   const [showTable, setShowTable] = useState(false);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [totalStaff, setTotalStaff] = useState(0);
+  const [totalCoach, setTotalCoach] = useState(0);
+  const [totalDriver, setTotalDriver] = useState(0);
   const [selectionModel, setSelectionModel] = useState([]);
   const data = {
     columns: [
@@ -98,7 +99,23 @@ export default function Dashboard() {
     const userInfo = await getUserInfo();
     const staffList = await getAllStaff();
     const coaches = await getAllCoaches();
-    const drivers = await getAllDrivers();
+    const driverList = await getAllDrivers();
+    const prices = bookings
+      .filter((booking) => booking.isVerify && !booking.isCancel)
+      .map((data) => data.totalPrice);
+    const totalPrice = prices.reduce((a, b) => a + b);
+    const staffs = staffList.filter(
+      (staff) =>
+        (staff.role === 'scheduling' || staff.role === 'tracking') &&
+        staff.workingStatus === 'working',
+    );
+    const drivers = driverList.filter(
+      (driver) => driver.workingStatus === 'working',
+    );
+    setTotalPrice(totalPrice);
+    setTotalStaff(staffs.length);
+    setTotalCoach(coaches.length);
+    setTotalDriver(drivers.length);
     dispatch({ type: 'get-booking', payload: bookings });
     dispatch({ type: 'get-profile', payload: userInfo });
     dispatch({ type: 'get-staff', payload: staffList });
@@ -131,24 +148,6 @@ export default function Dashboard() {
     </div>
   ) : (
     <div>
-      <GridContainer justify="flex-end">
-        <FormControl className={classes.formControl}>
-          <InputLabel htmlFor="grouped-native-select">Lựa chọn</InputLabel>
-          <Select
-            native
-            id="grouped-native-select"
-            onChange={(e) => {
-              console.log('values', e.target.value);
-            }}
-          >
-            <option value={4}>Tháng 4</option>
-            <option value={3}>Tháng 3</option>
-            <option value={2}>Tháng 2</option>
-            <option value={1}>Tháng 1</option>
-            {/* </optgroup> */}
-          </Select>
-        </FormControl>
-      </GridContainer>
       <GridContainer>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
@@ -156,9 +155,9 @@ export default function Dashboard() {
               <CardIcon color="warning">
                 <Icon>content_copy</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Doanh Thu tháng 4</p>
+              <p className={classes.cardCategory}>Doanh Thu dự kiến</p>
               <h3 className={classes.cardTitle}>
-                {formatNumber(43685000)} VNĐ
+                {formatNumber(totalPrice)} VNĐ
               </h3>
             </CardHeader>
             <CardFooter stats></CardFooter>
@@ -170,16 +169,18 @@ export default function Dashboard() {
               <CardIcon color="success">
                 <Store />
               </CardIcon>
-              <p className={classes.cardCategory}>Số chuyến thực hiện</p>
+              <p className={classes.cardCategory}>Tổng số xe khách</p>
               <div style={{ cursor: 'pointer' }}>
-                <h3
-                  className={classes.cardTitle}
-                  onClick={() => {
-                    setShowTable(true);
-                  }}
-                >
-                  125 chuyến
-                </h3>
+                <Link to="/admin/coaches/view">
+                  <h3
+                    className={classes.cardTitle}
+                    onClick={() => {
+                      setShowTable(true);
+                    }}
+                  >
+                    {totalCoach} xe
+                  </h3>
+                </Link>
               </div>
             </CardHeader>
             <CardFooter stats></CardFooter>
@@ -191,9 +192,11 @@ export default function Dashboard() {
               <CardIcon color="danger">
                 <Icon>info_outline</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Số chuyến huỷ</p>
+              <p className={classes.cardCategory}>Tổng số tài xế</p>
               <div style={{ cursor: 'pointer' }}>
-                <h3 className={classes.cardTitle}>15 chuyến </h3>
+                <Link to="/admin/driver/view">
+                  <h3 className={classes.cardTitle}>{totalDriver} người </h3>
+                </Link>
               </div>
             </CardHeader>
             <CardFooter stats></CardFooter>
@@ -205,9 +208,9 @@ export default function Dashboard() {
               <CardIcon color="info">
                 <Accessibility />
               </CardIcon>
-              <p className={classes.cardCategory}>Số nhân viên hiện tại</p>
+              <p className={classes.cardCategory}>Tổng số nhân viên</p>
               <Link to="/admin/staff/view">
-                <h3 className={classes.cardTitle}>15 người </h3>
+                <h3 className={classes.cardTitle}>{totalStaff} người </h3>
               </Link>
             </CardHeader>
             <CardFooter stats></CardFooter>

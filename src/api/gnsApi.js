@@ -38,6 +38,24 @@ export const getUserInfo = async () => {
   }
 };
 
+export const getTransitDetail = async (transitId) => {
+  try {
+    const res = await gnsTripApi.get(`/transit/${transitId}`, reqConfig);
+    return res.data.data;
+  } catch (err) {
+    alert(err.response.data.message);
+  }
+};
+
+export const getTripDetail = async (tripId) => {
+  try {
+    const res = await gnsTripApi.get(`/trip/${tripId}`, reqConfig);
+    return res.data.data;
+  } catch (err) {
+    alert(err.response.data.message);
+  }
+};
+
 export const refusedBooking = async (reqBody) => {
   try {
     await gnsBookingApi.post('/booking/verify/', reqBody, reqConfig);

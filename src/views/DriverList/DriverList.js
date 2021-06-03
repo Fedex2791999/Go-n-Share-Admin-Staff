@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import GridItem from 'components/Grid/GridItem.js';
 import GridContainer from 'components/Grid/GridContainer.js';
-import Table from 'components/Table/Table.js';
+import TableDriver from 'components/TableDriver/TableDriver';
 import Card from 'components/Card/Card.js';
 import CardHeader from 'components/Card/CardHeader.js';
 import CardBody from 'components/Card/CardBody.js';
@@ -62,7 +62,7 @@ export default function DriverList() {
             <h4 className={classes.cardTitleWhite}>Thông tin Tài Xế</h4>
           </CardHeader>
           <CardBody>
-            <Table
+            <TableDriver
               tableHeaderColor="primary"
               tableHead={[
                 'Id',
